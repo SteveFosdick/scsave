@@ -1,0 +1,6 @@
+*.inf
+*.lst
+*.rom
+scload
+scsave
+sctext
