@@ -71,7 +71,7 @@ cmdlp2	INX
 	CMP  #'a'		; if lower case then abbreviations are now ok.
 	BCS  cmdabok
 	EOR  (&F2),Y		; case-insenitive comparison.
-	AND  #&5F
+	AND  #&DF
 	BEQ  cmdlp2
 cmdnext INX			; skip forward to the exec address.
 	LDA  cmdtab,X
@@ -95,7 +95,7 @@ cmdabok LDA  (&F2),Y		; get character from the command line.
 	CMP  #'.'		; abbreviation?
 	BEQ  cmddot
 	EOR  cmdtab,X		; case-insenitive comparison.
-	AND  #&5F
+	AND  #&DF
 	BEQ  cmdlp3
 	LDA  cmdtab,X		; get byte from table.
 	BPL  cmdnext		; command finished before table entry.
