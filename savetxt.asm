@@ -115,18 +115,6 @@ savepal LDA  #&16               ; VDU mode command to file.
         JSR  OSBPUT
         LDA  mode
         JSR  OSBPUT
-        BIT  flag
-        BVC  nswin              ; No need to save window to file.
-        LDA  #&1C
-        JSR  OSBPUT
-        LDA  left
-        JSR  OSBPUT
-        LDA  bottom
-        JSR  OSBPUT
-        LDA  right
-        JSR  OSBPUT
-        LDA  top
-        JSR  OSBPUT
 nswin   LDA  flag
         PHA
         LDA  mode
@@ -212,22 +200,33 @@ skiplf  INC  top
         CPX  bottom
         BCC  rowloop
         BEQ  rowloop
-empty   LDA  #&00               ; Close the file.
-        LDY  file
-        JSR  OSFIND
-        BIT  flag
+empty   BIT  flag
         BVC  norest             ; No need to restore text window.
         LDA  #&1C
+        LDX  #&04
+        IF   palopt
+        BIT  flag
+        BPL  noput1
+        JSR  OSBPUT
+noput1  JSR  OSWRCH
+winlp   PLA
+        BIT  flag
+        BPL  noput2
+        JSR  OSBPUT
+noput2  JSR  OSWRCH
+        DEX
+        BNE  winlp
+        ELSE
         JSR  OSWRCH
-        PLA
+winlp   PLA
         JSR  OSWRCH
-        PLA
-        JSR  OSWRCH
-        PLA
-        JSR  OSWRCH
-        PLA
-        JSR  OSWRCH
-norest  LDA  #&1F               ; Restore the cursor position.
+        DEX
+        BNE  winlp
+        FI
+norest  LDA  #&00               ; Close the file.
+        LDY  file
+        JSR  OSFIND
+        LDA  #&1F               ; Restore the cursor position.
         JSR  OSWRCH
         PLA
         JSR  OSWRCH
