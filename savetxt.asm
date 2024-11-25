@@ -172,7 +172,7 @@ botloop JSR  lastcol            ; Find the last column used.
 botfnd  LDX  #&00
         STX  top
 rowloop JSR  lastcol
-        BEQ  rowend
+        BEQ  newlin
         LDA  #&00
         STA  col
         LDA  #&0D               ; go to the start of the line.
@@ -188,7 +188,12 @@ colloop JSR  OSWRCH
         INC  col
         LDA  #&09               ; move forward one character
         BNE  colloop
-rowend  LDA  #&0D
+rowend  BIT  flag               ; in non-palette mode we always send a CR.
+        BPL  newlin
+        LDA  last               ; if the last column with a character was
+        CMP  right              ; the right-most then skip the newline as
+        BEQ  skiplf             ; line wrap will take care of it.
+newlin  LDA  #&0D
         LDY  file
         JSR  OSBPUT
         BIT  flag               ; For palette file, we also send LF.
